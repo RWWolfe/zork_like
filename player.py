@@ -2,26 +2,25 @@
 #Classes should have as little responsibility as possible
 
 class Player:
-    def __init__(self, cr):
-        self._cr = cr
-        self.check0 = False
-        self.check1 = False
-        self.check2 = False
-        self.check3 = False
-        self.check4 = False
-        self.check5 = False
+    def __init__(self, current_room):
+        self._current_room = current_room
+        self.visited_rooms = {}
 
     @property
-    def cr(self):
-        return self._cr
+    def current_room(self):
+        return self._current_room
 
-    @cr.setter
-    def cr(self, val):
-        self._cr = val
-        
-
-
-    def check_win_condition(self):
-        return self.check0 and self.check1 and self.check2 and self.check3 and self.check4 and self.check5
-
+    @current_room.setter
+    def current_room(self, val):
+        self._current_room = val
     
+    def move_player(self, new_room):
+        self.current_room = new_room
+        self.visited_rooms[new_room.room_id] = new_room
+        
+    def check_win_condition(self, all_rooms):
+        for room in all_rooms:
+            if not self.visited_rooms.get(room.room_id):
+                return False
+        else:
+            return True
