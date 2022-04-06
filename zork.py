@@ -1,67 +1,74 @@
-from rooms import Room
+from room import Room
 from player import Player
-
-r0 = Room(0, "A small, one room church with pews and an altar. Path: ", True, False, False, False, "A book with details on the ritual. Take? ", False)
-r1 = Room(1, "There is a small church ahead. Paths: ", True, True, False, False, "Laid on the side of the church is a small shovel. Take?", False)
-r2 = Room(2, "bing ging", False, False, True, False, "Fing Ging", False)
-r3 = Room(3, "Before you stands the Obelisk. Surrounding it are several statues of people. Paths: ", True, True, True, True, "Crystal statues", False)
-r4 = Room(4, "An ampitheater, staged in front of the ocean. Path: ", False, False, False, True, "A bloody knife lays on the stage. Take?", False)
-r5 = Room(5, "A garden of various roses. Path: ", False, True, False, False, "A white rose", False)
+from config import room_layout_config
 
 
-#cr= current room
-
-player = Player(r3)
 
 
-while not player.check_win_condition():
-    print(player.cr.description)
-    if player.cr.north:
-        print(" North ")
-    if player.cr.south:
-        print(" South ")
-    if player.cr.east:
-        print(" East ")
-    if player.cr.west:
-        print(" West ")
-    dir = input("What do you do? ")
-    #disaster incoming
-    dir = dir.strip().lower()
-    if dir == "n" and player.cr.north:
-        if player.cr == r3:
-            player.cr = r5
-            player.check5 = True
-        if player.cr == r1:
-            player.cr = r3
-            player.check3 = True
-        if player.cr == r0:
-            player.cr = r1
-            player.check1 = True
-    if dir == "s" and player.cr.south:
-        if player.cr == r1:
-            player.cr = r0
-            player.check0 = True
-        if player.cr == r3:
-            player.cr = r1
-            player.check1 = True
-        if player.cr == r5:
-            player.cr = r3
-            player.check3 = True
-    if dir == "e" and player.cr.east:
-        if player.cr == r3:
-            player.cr = r4
-            player.check4 = True
-        if player.cr == r2:
-            player.cr = r3
-            player.check3 = True
-    if dir == "w" and player.cr.west:
-        if player.cr == r3:
-            player.cr = r2
-            player.check2 = True
-        if player.cr == r4:
-            player.cr = r3
-            player.check3 = True
+
+
+
+all_rooms = {}
+#i want to pull the room key from the dictionary in config for each room
+#a dictionary of rooms. kvp 
+
+
+
+for room_dict in room_layout_config:
+    room_key = room_dict["room_key"]               #obelisk
+    room_val = Room(room_dict["room_key"], room_dict["description"], room_dict["description_itemless"], room_dict["starting_room"], room_dict["north_room_key"], room_dict["south_room_key"], room_dict["west_room_key"], room_dict["east_room_key"], room_dict["item"])
+    kvp = {room_key: room_val}
+    all_rooms.update(kvp)
+
+
+
+
+
+"""""
+all_rooms = {
+"church": Room("church", "gingign", "no ging", False, "obelisk", None, None, None, None), 
+"obelisk": Room("obelisk", "tall", "small", True, "garden", "church", "mountainside", "theater", "height")
+"""
+
+
+
+
+
+
+
+
+#for room in room_layout_config:
+    #room_key = ["room_key"]
+    #room_val = 
+    #all_rooms.update(Room(room["room_key"], room["description"], room["description_itemless"], room["starting_room"], room["north_room_key"], room["south_room_key"], room["west_room_key"], room["east_room_key"], room["item"]))
+
+
+player= Player(Player.get_starting_room(all_rooms))
+
+while len(player.items) != len(room_layout_config):
+    print(player.current_room.description)
+    if player.current_room.north_room_key:
+        print(" North")
+    if player.current_room.south_room_key:
+        print(" South")
+    if player.current_room.east_room_key:
+        print(" East")
+    if player.current_room.west_room_key:
+        print(" West")
+    if player.current_room.item:
+        print(" Take" + " " + player.current_room.item + "?")
     
+    user_input = input("What do you do? ")
+    user_input = user_input.strip().lower()
+
+    try:
+        next_room_key = player.get_player_action(user_input)
+   
+        next_room = all_rooms[next_room_key]
+  
+        player.current_room = next_room
     
-if player.check_win_condition():
-        print("You win!")
+    except KeyError:
+        continue
+
+print("I am Die")
